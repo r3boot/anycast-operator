@@ -33,11 +33,13 @@ func NewKubeClient(kcConfig *KubeClientConfig) (*KubeClient, error) {
 		kcConfig: kcConfig,
 	}
 
+	log.Infof("NewKubeClient: Fetching configuration")
 	config, err := client.getConfig(kcConfig.KubeConfigPath)
 	if err != nil {
 		return nil, fmt.Errorf("NewKubeClient: %v", err)
 	}
 
+	log.Infof("NewKubeClient: Loading client")
 	client.clientSet, err = kubernetes.NewForConfig(config)
 	if err != nil {
 		panic(err.Error())
@@ -49,21 +51,25 @@ func NewKubeClient(kcConfig *KubeClientConfig) (*KubeClient, error) {
 func (c *KubeClient) getConfig(kubeConfigPath string) (*rest.Config, error) {
 	var err error
 
-	log.Infof("KubeClient.getConfig: kubeConfigPath = %s", kubeConfigPath)
+	log.Infof("kubeConfigPath = %s", kubeConfigPath)
 
 	runningInCluster := false
 	if os.Getenv(KUBERNETES_SERVICE_HOST) != "" && os.Getenv(KUBERNETES_SERVICE_PORT) != "" {
 		runningInCluster = true
 	}
 
+	log.Infof("runningInCluster: %v", runningInCluster)
+	fmt.Printf("runningInCluster: %v", runningInCluster)
+
 	config := &rest.Config{}
 	if runningInCluster {
+		log.Infof("KubeClient.getConfig: Running inside cluster")
 		config, err = rest.InClusterConfig()
 		if err != nil {
 			return nil, fmt.Errorf("KubeClient.getConfig: rest.InClusterConfig: %v", err)
 		}
-		log.Debugf("KubeClient.getConfig: Running inside cluster")
 	} else {
+		log.Infof("KubeClient.getConfig: Running outside of cluster")
 		_, err := os.Stat(kubeConfigPath)
 		if os.IsNotExist(err) {
 			return nil, fmt.Errorf("KubeClient.getConfig: no configuration found")
@@ -73,7 +79,6 @@ func (c *KubeClient) getConfig(kubeConfigPath string) (*rest.Config, error) {
 		if err != nil {
 			return nil, fmt.Errorf("KubeClient.getConfig: clientcmd.BuildConfigFromFlags: %v", err)
 		}
-		log.Debugf("KubeClient.getConfig: Running outside of cluster")
 	}
 
 	return config, nil

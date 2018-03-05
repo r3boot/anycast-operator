@@ -86,6 +86,12 @@ func main() {
 		namespaces = append(namespaces, ns)
 	}
 
+	if len(namespaces) == 1 {
+		log.Infof("Working on %s namespace", namespaces[0])
+	} else {
+		log.Infof("Working on all namespaces")
+	}
+
 	for {
 		// Fetch ExternalIPs from configured Kubernetes Services
 		externalIPs := []string{}
