@@ -31,6 +31,11 @@ func NewLoopback(cfg *LoopbackInterfaceConfig) (*LoopbackInterface, error) {
 		return nil, fmt.Errorf("NewLoopback: %v", err)
 	}
 
+	_, err = intf.ip("link", "set", intf.config.Interface, "up")
+	if err != nil {
+		return nil, fmt.Errorf("NewLoopback: %v", err)
+	}
+
 	return intf, nil
 }
 
