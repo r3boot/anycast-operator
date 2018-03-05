@@ -5,6 +5,9 @@ import (
 	"fmt"
 	"os/exec"
 	"strings"
+
+	"github.com/prometheus/common/log"
+	"github.com/r3boot/anycast-operator/pkg/utils"
 )
 
 type LoopbackInterfaceConfig struct {
@@ -41,6 +44,8 @@ func (l *LoopbackInterface) ip(args ...string) ([]string, error) {
 	cmd.Stdout = &stdoutBuf
 	cmd.Stderr = &stderrBuf
 
+	log.Debugf("Running '%s %s'", l.cmd, strings.Join(args, " "))
+
 	err := cmd.Run()
 	if err != nil {
 		return nil, fmt.Errorf("LoopbackInterface.ip: cmd.Run: %v", err)
@@ -67,4 +72,26 @@ func (l *LoopbackInterface) GetAnycastIPs() ([]string, error) {
 	}
 
 	return allAnycastIPs, nil
+}
+
+func (l *LoopbackInterface) AddIPAddress(addr string) error {
+	addr = utils.AddCIDR(addr)
+
+	_, err := l.ip("addr", "add", addr, "dev", l.config.Interface)
+	if err != nil {
+		return fmt.Errorf("LoopbackInterface.AddIPAddress: %v", err)
+	}
+
+	return nil
+}
+
+func (l *LoopbackInterface) RemoveIPAddress(addr string) error {
+	addr = utils.AddCIDR(addr)
+
+	_, err := l.ip("addr", "del", addr, "dev", l.config.Interface)
+	if err != nil {
+		return fmt.Errorf("LoopbackInterface.RemoveIPAddress: %v", err)
+	}
+
+	return nil
 }

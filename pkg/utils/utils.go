@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os/user"
 	"path/filepath"
+	"strings"
 )
 
 func ExpandTilde(path string) (string, error) {
@@ -17,4 +18,18 @@ func ExpandTilde(path string) (string, error) {
 	}
 
 	return filepath.Join(usr.HomeDir, path[1:]), nil
+}
+
+func AddCIDR(addr string) string {
+	if !strings.Contains(addr, "/") {
+		if strings.Contains(addr, ":") {
+			// IPv6
+			addr += "/128"
+		} else {
+			// IPv4
+			addr += "/32"
+		}
+	}
+
+	return addr
 }

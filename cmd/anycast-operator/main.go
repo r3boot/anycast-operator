@@ -145,7 +145,7 @@ func main() {
 
 		if len(ipsToAdd) > 0 {
 			for _, ip := range ipsToAdd {
-				log.Infof("ip addr add %s/32 dev %s", ip, *cfgInterface)
+				lbInterface.AddIPAddress(ip)
 			}
 
 			log.Infof("Added %d ip addresses to %s", len(ipsToAdd), *cfgInterface)
@@ -153,7 +153,7 @@ func main() {
 
 		if len(ipsToRemove) > 0 {
 			for _, ip := range ipsToRemove {
-				log.Infof("ip addr remove %s/32 dev %s", ip, *cfgInterface)
+				lbInterface.RemoveIPAddress(ip)
 			}
 
 			log.Infof("Removed %d ip addresses from %s", len(ipsToAdd), *cfgInterface)

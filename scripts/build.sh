@@ -12,9 +12,9 @@ if [[ ! -d "${GOPATH}" ]]; then
     exit 1
 fi
 
-go get -v github.com/r3boot/${TARGET}
 go get -v github.com/r3boot/${TARGET}/...
 cd ${GOPATH}/src/github.com/r3boot/${TARGET}
 go build -v -o ${GOPATH}/${TARGET} cmd/${TARGET}/main.go
 strip ${GOPATH}/${TARGET}
 ls -lah ${GOPATH}/${TARGET}
+chown -R 1000:1000 ${GOPATH}/*
